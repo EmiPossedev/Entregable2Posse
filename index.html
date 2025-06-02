@@ -1,18 +1,25 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Simulador de Venta de Entradas</title>
+  <meta charset="UTF-8">
+  <title>Simulador de Venta de Entradas</title>
+  <script src="script.js" defer></script>
 </head>
 <body>
-    <div class="container">
-        <header class="header">
-            <h1>🎭 Simulador de Venta de Entradas</h1>
-            <p>Selecciona tus eventos favoritos y arma tu carrito de compras</p>
-        </header>
-<script src="script.js"></script>
+  <h1>Venta de Entradas - Evento</h1>
+
+  <label for="evento">Seleccioná un evento:</label>
+  <select id="evento">
+    <option value="">-- Elegí uno --</option>
+  </select>
+
+  <label for="cantidad">Cantidad de entradas:</label>
+  <input type="number" id="cantidad" min="1" />
+
+  <button id="calcular">Calcular Total</button>
+
+  <p id="resultado"></p>
 </body>
-<footer class="footer">
-    <p>2025 Simulador de Venta de Entradas. Todos los derechos reservados.</p>
-</footer>
+</html>
+
+   

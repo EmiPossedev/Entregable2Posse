@@ -6,20 +6,25 @@
   <script src="script.js" defer></script>
 </head>
 <body>
-  <h1>Venta de Entradas - Evento</h1>
+  <h1>Venta de Entradas</h1>
 
-  <label for="evento">Seleccioná un evento:</label>
+  <label for="evento">Elegí un evento:</label>
   <select id="evento">
-    <option value="">-- Elegí uno --</option>
+    <option value="">-- Seleccioná --</option>
   </select>
 
-  <label for="cantidad">Cantidad de entradas:</label>
+  <label for="cantidad">Cantidad:</label>
   <input type="number" id="cantidad" min="1" />
 
-  <button id="calcular">Calcular Total</button>
+  <button id="agregar">Agregar al carrito</button>
+  <button id="calcular">Calcular el total del carrito</button>
 
-  <p id="resultado"></p>
+  <p id="mensaje"></p>
+
+  <h2>Carrito</h2>
+  <ul id="carrito"></ul>
+
+  <p id="total"></p>
+  <button id="confirmar" style="display: none;">Confirmar compra</button>
 </body>
 </html>
-
-   

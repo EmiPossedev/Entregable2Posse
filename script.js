@@ -1,52 +1,111 @@
-// Lista de eventos con nombre, precio, hora y lugar
 const eventos = [
-  { nombre: "Recital de Rock", precio: 50000, id: 1, hora: "20:00 hs", lugar: "Estadio Brigadier Estanislao López" },
-  { nombre: "Fiesta Electrónica", precio: 30000, id: 2, hora: "00:00 hs", lugar: "Complejo Complot" },
-  { nombre: "Obra de Teatro", precio: 10000, id: 3, hora: "21:00 hs", lugar: "Teatro Municipal" }
+  { id: 1, nombre: "Recital de Rock", precio: 50000, hora: "20:00", lugar: "Estadio" },
+  { id: 2, nombre: "Fiesta Electrónica", precio: 30000, hora: "00:00", lugar: "Complejo Complot" },
+  { id: 3, nombre: "Obra de Teatro", precio: 10000, hora: "21:00", lugar: "Teatro Municipal" }
 ];
 
-// Referencias a elementos del DOM
-const seleccionarEvento = document.getElementById("evento");
-const cantidadEntradas = document.getElementById("cantidad");
-const botonCalcular = document.getElementById("calcular");
-const parrafoResultado = document.getElementById("resultado");
+const select     = document.getElementById("evento");
+const input      = document.getElementById("cantidad");
+const btnAgregar = document.getElementById("agregar");
+const btnCalcular = document.getElementById("calcular");
+const btnConfirmar = document.getElementById("confirmar");
+const mensaje    = document.getElementById("mensaje");
+const lista      = document.getElementById("carrito");
+const totalTxt   = document.getElementById("total");
 
-// Agregar opciones al menú desplegable
-eventos.forEach(evento => {
-  const opcion = document.createElement("option");
-  opcion.value = evento.id;
-  opcion.text = `${evento.nombre} - $${evento.precio}`;
-  seleccionarEvento.appendChild(opcion);
+// Cargar opciones en el select
+eventos.forEach(e => {
+  const option = document.createElement("option");
+  option.value = e.id;
+  option.text = `${e.nombre} - $${e.precio}`;
+  select.appendChild(option);
 });
 
-// Escuchar el clic del botón
-botonCalcular.addEventListener("click", () => {
-  const idSeleccionado = parseInt(seleccionarEvento.value);
-  const cantidad = parseInt(cantidadEntradas.value);
+// Cargar carrito de localStorage
+let carrito = JSON.parse(localStorage.getItem("carrito")) || [];
+mostrarCarrito();
 
-  if (isNaN(idSeleccionado) || isNaN(cantidad) || cantidad <= 0) {
-    parrafoResultado.innerText = "⚠️ Por favor, seleccioná un evento y una cantidad válida.";
+// Cargar última selección
+const ultima = JSON.parse(sessionStorage.getItem("seleccion"));
+if (ultima) {
+  select.value = ultima.id;
+  input.value = ultima.cantidad;
+}
+
+// Botón Agregar al carrito
+btnAgregar.addEventListener("click", () => {
+  const id = parseInt(select.value);
+  const cantidad = parseInt(input.value);
+
+  if (!id || !cantidad || cantidad <= 0) {
+    mensaje.innerText = "⚠️ Seleccioná un evento y cantidad válida.";
     return;
   }
 
-  const evento = eventos.find(e => e.id === idSeleccionado);
+  const evento = eventos.find(e => e.id === id);
   const total = evento.precio * cantidad;
 
-  parrafoResultado.innerText = `🎟️ Compraste ${cantidad} entrada(s) para "${evento.nombre}".\nHorario: ${evento.hora} - Ubicación: ${evento.lugar}.\nTotal a pagar: $${total}.`;
+  // Guardar selección de sesión
+  sessionStorage.setItem("seleccion", JSON.stringify({ id, cantidad }));
+
+  // Agregar al carrito
+  carrito.push({
+    nombre: evento.nombre,
+    cantidad,
+    total,
+    hora: evento.hora,
+    lugar: evento.lugar
+  });
+
+  localStorage.setItem("carrito", JSON.stringify(carrito));
+  mensaje.innerText = `✅ ${cantidad} entrada(s) para "${evento.nombre}" agregadas.`;
+  mostrarCarrito();
+
+  // Ocultar total y botón de confirmación si se agregó algo nuevo
+  totalTxt.innerText = "";
+  btnConfirmar.style.display = "none";
 });
 
-// Crear el botón de confirmar compra y agregarlo a la página
-const confirmarBtn = document.createElement('button');
-confirmarBtn.textContent = 'Confirmar Compra';
-confirmarBtn.style.display = 'none';
-document.body.appendChild(confirmarBtn);
+// Botón Calcular el total del carrito
+btnCalcular.addEventListener("click", () => {
+  if (carrito.length === 0) {
+    totalTxt.innerText = "🛒 El carrito está vacío.";
+    btnConfirmar.style.display = "none";
+    return;
+  }
 
-// Mostrar el botón cuando se calcula el total
-botonCalcular.addEventListener('click', () => {
-  confirmarBtn.style.display = 'block';
+  let totalFinal = 0;
+  carrito.forEach(item => totalFinal += item.total);
+
+  totalTxt.innerText = `💰 Total del carrito: $${totalFinal}`;
+  btnConfirmar.style.display = "inline";
 });
 
-// Al hacer clic en confirmar, mostrar mensaje y ocultar el botón
-confirmarBtn.addEventListener('click', () => {
-  parrafoResultado.innerText = '¡Compra confirmada! Gracias por tu compra.';
+// Botón Confirmar compra
+btnConfirmar.addEventListener("click", () => {
+  if (carrito.length === 0) return;
+
+  alert("✅ ¡Gracias por tu compra! Disfrutá el evento 🎉");
+  carrito = [];
+  localStorage.removeItem("carrito");
+  mostrarCarrito();
+  totalTxt.innerText = "";
+  mensaje.innerText = "";
+  btnConfirmar.style.display = "none";
 });
+
+// Función para mostrar el carrito en la lista
+function mostrarCarrito() {
+  lista.innerHTML = "";
+  if (carrito.length === 0) {
+    lista.innerHTML = "<li>El carrito está vacío.</li>";
+    return;
+  }
+
+  carrito.forEach((item, i) => {
+    const li = document.createElement("li");
+    li.innerText = `#${i + 1} ${item.nombre} - ${item.cantidad} entrada(s) - $${item.total}
+Horario: ${item.hora} - Lugar: ${item.lugar}`;
+    lista.appendChild(li);
+  });
+}
